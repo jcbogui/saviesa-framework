@@ -1,176 +1,212 @@
 # Getting Started with Saviesa Framework
 
-This guide will help you set up and run your first Saviesa validation.
+This guide will help you get started with the Saviesa Framework for institutional performance diagnosis.
 
 ---
 
 ## 📋 Prerequisites
 
-- **Python 3.11+** installed
-- **Git** installed
-- Basic knowledge of Python and command line
+- **Python 3.11+**
+- **pip** (Python package manager)
+- **Git** (for cloning the repository)
 
 ---
 
 ## 🚀 Installation
 
-### **Step 1: Clone the repository**
+### **1. Clone the repository**
 
 ```bash
 git clone https://github.com/jcbogui/saviesa-framework.git
 cd saviesa-framework
 ```
 
-### **Step 2: Create virtual environment (recommended)**
-
-**Windows:**
-```bash
-python -m venv venv
-venv\Scripts\activate
-```
-
-**Linux/Mac:**
-```bash
-python3 -m venv venv
-source venv/bin/activate
-```
-
-### **Step 3: Install dependencies**
+### **2. Install dependencies**
 
 ```bash
 pip install -r requirements.txt
 ```
 
+**Required packages**:
+- numpy, pandas, scipy
+- scikit-learn, statsmodels
+- matplotlib, seaborn, plotly
+- jupyter, pytest
+
 ---
 
-## 🔬 Running Your First Validation
+## 🎯 Running Validations
 
 ### **COVID-19 Validation**
+
+Validate the Saviesa framework on COVID-19 vaccination data (n=65 French departments):
 
 ```bash
 python scripts/validation/validation_covid.py
 ```
 
-**Expected output:**
-```
-Dataset chargé: n=65 départements
-
-============================================================
-VALIDATION COVID-19 (n=65)
-============================================================
-
-[1/3] Modèle M0 (Additif)...
-  R² = 0.9951
-  RMSE = 0.0061
-  MAE = 0.0048
-
-[2/3] Modèle M1 (Interaction)...
-  R² = 1.0000
-  RMSE = 0.0000
-  MAE = 0.0000
-
-[3/3] Modèle M2 (Multiplicatif)...
-  R² = 1.0000
-  RMSE = 0.0000
-  MAE = 0.0000
-
-✅ Résultats sauvegardés: results/Validation_COVID_Results.csv
-```
+**Expected output**:
+- Model comparison (Additive, Interaction, Multiplicative)
+- Performance metrics (R², RMSE, MAE, AIC)
+- Results saved to `results/covid_validation.csv`
 
 ---
 
-## 📊 Understanding the Results
+### **Education Validation**
 
-### **Key Metrics**
-
-- **R²**: Proportion of variance explained (higher = better)
-- **RMSE**: Root Mean Squared Error (lower = better)
-- **MAE**: Mean Absolute Error (lower = better)
-
-### **Model Comparison**
-
-| Model | Description | When to use |
-|-------|-------------|-------------|
-| **M0 (Additif)** | F = α₀ + α_L·L + α_M·M | Compensatory factors |
-| **M1 (Interaction)** | M0 + α_I·(L×M) | Partial non-compensability |
-| **M2 (Multiplicatif)** | log(F) = β₀ + β_L·log(L) + β_M·log(M) | Full non-compensability |
-
-### **Interpretation**
-
-**COVID-19 results** show:
-- M2 (Multiplicatif) achieves R²=1.0000 (perfect fit)
-- M0 (Additif) achieves R²=0.9951 (good but suboptimal)
-- **Conclusion**: Non-compensatory structure confirmed
-
----
-
-## 📈 Next Steps
-
-### **1. Explore Education Validation**
+Validate on education performance data (n=2,325 lycées):
 
 ```bash
 python scripts/validation/validation_education.py
 ```
 
-### **2. Run Diagnostic Comparison**
+**Expected output**:
+- Model comparison (Additive, Multiplicative)
+- Coefficient interpretation
+- Results saved to `results/education_validation.csv`
+
+---
+
+### **Diagnostic Comparison**
+
+Compare multiplicative vs. additive diagnostics:
 
 ```bash
 python scripts/validation/diagnostic_differentiel.py
 ```
 
-### **3. Try LOOCV Validation**
+**Expected output**:
+- Limiting factor identification for each department
+- Convergence/divergence analysis
+- Divergence rate: 43.1%
+- Results saved to `results/diagnostic_comparison.csv`
+
+---
+
+## 📓 Interactive Examples
+
+### **Jupyter Notebooks**
+
+Launch Jupyter to explore interactive examples:
 
 ```bash
-python scripts/validation/loocv_validation.py
+jupyter notebook
 ```
 
-### **4. Explore Jupyter Notebooks**
+Then open:
+- `examples/example_covid.ipynb` - COVID-19 validation walkthrough
+- `examples/example_education.ipynb` - Education validation walkthrough
+
+---
+
+## 🧪 Running Tests
+
+Run unit tests to verify installation:
 
 ```bash
-jupyter notebook examples/example_covid.ipynb
+pytest tests/
+```
+
+**Test coverage**:
+- `test_models.py` - Model implementations
+- `test_metrics.py` - Performance metrics
+
+---
+
+## 📊 Using Your Own Data
+
+### **Data Format**
+
+Your dataset should be a CSV file with the following columns:
+
+```csv
+id,L,M,F
+1,0.75,0.82,0.65
+2,0.68,0.91,0.72
+...
+```
+
+Where:
+- **L**: Levier (resources/capacity), normalized [0,1]
+- **M**: Milieu (environment/context), normalized [0,1]
+- **F**: Performance outcome, normalized [0,1]
+
+### **Example Code**
+
+```python
+import pandas as pd
+from scripts.utils.models import MultiplicativeModel
+
+# Load your data
+df = pd.read_csv('your_data.csv')
+X = df[['L', 'M']].values
+y = df['F'].values
+
+# Fit multiplicative model
+model = MultiplicativeModel()
+model.fit(X, y)
+
+# Make predictions
+y_pred = model.predict(X)
+
+# Get R²
+r2 = model.score(X, y)
+print(f"R² = {r2:.4f}")
 ```
 
 ---
 
 ## 🔧 Troubleshooting
 
-### **Issue: Module not found**
+### **Import Errors**
 
-**Solution**: Ensure you activated the virtual environment and installed dependencies:
+If you encounter import errors:
+
 ```bash
-pip install -r requirements.txt
-```
-
-### **Issue: Data file not found**
-
-**Solution**: Ensure you're in the project root directory:
-```bash
+# Ensure you're in the project root directory
 cd saviesa-framework
-python scripts/validation/validation_covid.py
+
+# Reinstall dependencies
+pip install -r requirements.txt --upgrade
 ```
 
-### **Issue: Python version**
+### **Data Not Found**
 
-**Solution**: Check Python version (must be 3.11+):
+If validation scripts can't find data:
+
+```bash
+# Check data directory structure
+ls data/processed/
+
+# Should contain:
+# - Article2_Dataset_COVID.csv
+```
+
+### **Python Version**
+
+Check your Python version:
+
 ```bash
 python --version
+# Should be 3.11 or higher
 ```
 
 ---
 
 ## 📚 Further Reading
 
-- [Methodology](methodology.md): Theoretical foundations
-- [API Reference](api_reference.md): Code documentation
-- [Tutorials](tutorials/): Step-by-step guides
+- **Methodology**: See [README.md](../README.md) for detailed methodology
+- **API Reference**: See docstrings in `scripts/utils/` modules
+- **Contributing**: See [CONTRIBUTING.md](../CONTRIBUTING.md) for contribution guidelines
 
 ---
 
-## 📧 Need Help?
+## 📞 Support
 
 - **Issues**: [GitHub Issues](https://github.com/jcbogui/saviesa-framework/issues)
-- **Email**: [jean.bogui@proton.me](mailto:jean.bogui@proton.me)
+- **Email**: jean.bogui@proton.me
+- **Documentation**: [docs/](.)
 
 ---
 
-**Happy validating!** 🎉
+**Happy analyzing!** 🎉
