@@ -18,7 +18,7 @@ Before starting, ensure you have:
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/saviesa-framework.git
+git clone https://github.com/jcbogui/saviesa-framework.git
 cd saviesa-framework
 ```
 
